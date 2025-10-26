@@ -2,9 +2,20 @@ import { Text, TouchableOpacity, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { PATHS } from "../Router/Router";
 import { AntDesign, FontAwesome5 } from "@expo/vector-icons";
+import { useDispatch } from "react-redux";
+import { deleteTodo, toggleTodo } from "../store/todoSlice";
 
-const TodoItem = ({ todo, deleteTodo, completeTodo }) => {
+const TodoItem = ({ todo }) => {
   const { navigate } = useNavigation();
+  const dispatch = useDispatch();
+
+  const handleDelete =  (id) => {
+    dispatch(deleteTodo(id));
+  };
+
+  const handleToggle =  (id) => {
+    dispatch(toggleTodo(id));
+  };
 
   return (
     <TouchableOpacity
@@ -25,8 +36,18 @@ const TodoItem = ({ todo, deleteTodo, completeTodo }) => {
         {todo.title}
       </Text>
       <View style={{ flexDirection: "row", gap: 10, alignItems: "center" }}>
-        <FontAwesome5 name="trash" size={18} color="red" onPress={() => deleteTodo(todo.id)} />
-        <AntDesign name="check-circle" size={18} color="green" onPress={() => completeTodo(todo.id)}/>
+        <FontAwesome5
+          name="trash"
+          size={18}
+          color="red"
+          onPress={() => handleDelete(todo.id)}
+        />
+        <AntDesign
+          name="check-circle"
+          size={18}
+          color="green"
+          onPress={() => handleToggle(todo.id)}
+        />
       </View>
     </TouchableOpacity>
   );

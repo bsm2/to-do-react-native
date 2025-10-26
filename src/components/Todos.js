@@ -1,9 +1,9 @@
-import { View, Text, TouchableOpacity, FlatList } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { View, FlatList } from "react-native";
 import { styles } from "../styles";
 import TodoItem from "./TodoItem";
+import { styles } from './../../src copy/styles';
 
-const Todos = ({ todos, deleteTodo, completeTodo }) => {
+const Todos = ({ todos }) => {
   return (
     <View style={styles.todosContainer}>
       <FlatList
@@ -11,8 +11,6 @@ const Todos = ({ todos, deleteTodo, completeTodo }) => {
         renderItem={({ item }) => (
           <TodoItem
             todo={item}
-            deleteTodo={deleteTodo}
-            completeTodo={completeTodo}
           />
         )}
         keyExtractor={(item) => item.id}

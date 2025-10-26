@@ -1,11 +1,13 @@
 import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
-import React, { useState } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { styles } from "../styles";
+import { addTodo } from "../store/todoSlice";
+import { useDispatch } from "react-redux";
+import { useState } from "react";
 
-const TodoForm = ({ setTodos }) => {
+const TodoForm = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const dispatch = useDispatch();
 
   const submit = async () => {
     if (!title.trim()) {
@@ -21,11 +23,7 @@ const TodoForm = ({ setTodos }) => {
     };
 
     try {
-      const storedTodos = await AsyncStorage.getItem("TODOS");
-      const todos = storedTodos ? JSON.parse(storedTodos) : [];
-      const updatedTodos = [...todos, newTodo];
-      await AsyncStorage.setItem("TODOS", JSON.stringify(updatedTodos));
-      setTodos(updatedTodos);
+      dispatch(addTodo(newTodo));
       setTitle("");
       setDescription("");
     } catch (error) {

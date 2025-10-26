@@ -1,45 +1,24 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  FlatList,
+  ActivityIndicator,
+} from "react-native";
 import { styles } from "./styles";
 import TodoForm from "./components/TodoForm";
-import Todos from "./components/Todos";
+import TodoItem from "./components/TodoItem";
 import { useState, useEffect } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import { useDispatch, useSelector } from "react-redux";
+import { loadTodos } from "./store/todoSlice";
 const Home = () => {
-  const [todos, setTodos] = useState([]);
-  const [filter, setFilter] = useState("all"); // 👈 added filter state
+  const dispatch = useDispatch();
+  const { items: todos, loading } = useSelector((state) => state.todos);
+  const [filter, setFilter] = useState("all");
 
   useEffect(() => {
-    const loadTodos = async () => {
-      try {
-        const stored = await AsyncStorage.getItem("TODOS");
-        if (stored) setTodos(JSON.parse(stored));
-      } catch (error) {
-        console.error("Error loading todos:", error);
-      }
-    };
-    loadTodos();
-  }, []);
-
-  const deleteTodo = async (id) => {
-    try {
-      setTodos((prev) => {
-        const updated = prev.filter((item) => item.id !== id);
-        AsyncStorage.setItem("TODOS", JSON.stringify(updated));
-        return updated;
-      });
-    } catch (error) {
-      console.error("Error deleting todo:", error);
-    }
-  };
-
-  const completeTodo = async (id) => {
-    const updated = todos.map((todo) =>
-      todo.id === id ? { ...todo, completed: !todo.completed } : todo
-    );
-    setTodos(updated);
-    await AsyncStorage.setItem("TODOS", JSON.stringify(updated));
-  };
+    dispatch(loadTodos());
+  }, [dispatch]);
 
   const filteredTodos = todos.filter((todo) => {
     if (filter === "active") return !todo.completed;
@@ -47,16 +26,12 @@ const Home = () => {
     return true;
   });
 
-  return (
-    <View style={styles.container}>
-      <TodoForm setTodos={setTodos} />
-
+  const renderHeader = () => (
+    <View>
+      <TodoForm />
       <View style={styles.filterContainer}>
         <TouchableOpacity
-          style={[
-            styles.filterBtn,
-            filter === "all" && styles.activeFilterBtn,
-          ]}
+          style={[styles.filterBtn, filter === "all" && styles.activeFilterBtn]}
           onPress={() => setFilter("all")}
         >
           <Text
@@ -103,13 +78,43 @@ const Home = () => {
           </Text>
         </TouchableOpacity>
       </View>
-
-      <Todos
-        todos={filteredTodos}
-        deleteTodo={deleteTodo}
-        completeTodo={completeTodo}
-      />
     </View>
+  );
+
+  return (
+    <FlatList
+      data={filteredTodos}
+      keyExtractor={(item) => item.id.toString()}
+      renderItem={({ item }) => <TodoItem todo={item} />}
+      ListHeaderComponent={renderHeader}
+      contentContainerStyle={{ padding: 20, paddingBottom: 100 }}
+      keyboardShouldPersistTaps="handled"
+      ListEmptyComponent={
+        loading ? (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              paddingVertical: 150,
+            }}
+          >
+            <ActivityIndicator size="large" color="#1976D2" />
+          </View>
+        ) : (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              paddingVertical: 100,
+            }}
+          >
+            <Text style={{ color: "#666" }}>No todos found</Text>
+          </View>
+        )
+      }
+    />
   );
 };
 

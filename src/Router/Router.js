@@ -22,7 +22,7 @@ const Router = () => {
       <SafeAreaView style={{ flex: 1 }} edges={["top", "left", "right"]}>
         <Navigator
           screenOptions={{
-            headerShown: Platform.OS == "ios",
+            headerShown: Platform.OS === "ios",
             headerStyle: { backgroundColor: "#1976D2" },
             headerTitleStyle: {
               color: "#FFFFFF",
