@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const loadTodos = createAsyncThunk("todos/load", async () => {
-  await new Promise((resolve) => setTimeout(resolve, 3000));
+  await new Promise((resolve) => setTimeout(resolve, 1000));
 
   const data = await AsyncStorage.getItem("TODOS");
   return data ? JSON.parse(data) : [];
